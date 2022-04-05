@@ -1,11 +1,11 @@
 import sys
-from PyQt5.QtWidgets import (QStatusBar, QMainWindow, QApplication, QMessageBox, 
+from PyQt5.QtWidgets import (QStatusBar, QMainWindow, QApplication, QMessageBox,
                              QFileDialog, QDialog, QVBoxLayout, QRadioButton)
 from PyQt5 import QtCore
 from PyQt5 import QtGui
 from PyQt5 import uic
 import sqlite3
-from pyproj import Transformer, CRS
+from pyproj import Transformer, CRS, _datadir, datadir
 from pygeodesy.dms import parseDMS, latDMS, lonDMS
 import pickle
 import pandas as pd
@@ -19,6 +19,7 @@ QIcon = QtGui.QIcon
 crsObject = {}
 qt_creator_file = "mainwindow.ui"
 Ui_MainWindow, QtBaseClass = uic.loadUiType(qt_creator_file)
+
 
 # create dictionary of settings to be saved
 
@@ -79,7 +80,7 @@ class TableModel(QtCore.QAbstractTableModel):
         self._data = data
 
     def flags(self, index):
-        fl = super(self.__class__,self).flags(index)
+        fl = super(self.__class__, self).flags(index)
         fl |= Qt.ItemIsEditable
         fl |= Qt.ItemIsSelectable
         fl |= Qt.ItemIsEnabled
@@ -104,7 +105,7 @@ class TableModel(QtCore.QAbstractTableModel):
             row = index.row()
             col = index.column()
             self._data.iloc[row][col] = value
-            self.dataChanged.emit(index, index, (Qt.DisplayRole, ))
+            self.dataChanged.emit(index, index, (Qt.DisplayRole,))
             return True
         return False
 
@@ -113,7 +114,7 @@ class TableModel(QtCore.QAbstractTableModel):
 
     def columnCount(self, index):
         return self._data.shape[1]
-    
+
     def headerData(self, section, orientation, role):
         # section is the index of the column/row.
         if role == Qt.DisplayRole:
@@ -121,8 +122,8 @@ class TableModel(QtCore.QAbstractTableModel):
                 return str(self._data.columns[section])
 
             if orientation == Qt.Vertical:
-
                 return str(self._data.index[section])
+
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     model = None
@@ -138,12 +139,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         def show_about_dialog():
             text = "<center>" \
-                    "<h1>Coordinate Converter</h1>" \
-                    "&#8291;" \
-                    "<img src=globe.jfif>" \
-                    "<p>Version 1.0.0<br/>" \
-                    "Copyright &copy; A. Beckett 2020" \
-                    "</center> </p>"
+                   "<h1>Coordinate Converter</h1>" \
+                   "&#8291;" \
+                   "<img src=globe.jfif>" \
+                   "<p>Version 1.0.0<br/>" \
+                   "Copyright &copy; A.D. Beckett 2022" \
+                   "</center> </p>"
             msgBox = QMessageBox()
             msgBox.setWindowIcon(QIcon('globe.png'))
             msgBox.setText(text)
@@ -151,6 +152,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             msgBox.exec()
             # QMessageBox.about(self, "About Coordinate Converter", text)
+
         def open_file():
             options = QFileDialog.Options()
             options |= QFileDialog.DontUseNativeDialog
@@ -180,11 +182,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.fileSelect.clicked.connect(open_file)
 
-
         def save_file():
             options = QFileDialog.Options()
             options |= QFileDialog.DontUseNativeDialog
-            fileName, _ = QFileDialog.getSaveFileName(self,"QFileDialog.getSaveFileName()", "","CSV Files (*.csv)", options=options)
+            fileName, _ = QFileDialog.getSaveFileName(self, "QFileDialog.getSaveFileName()", "", "CSV Files (*.csv)",
+                                                      options=options)
             if fileName:
                 self.data.to_csv(fileName, index=False)
 
@@ -200,14 +202,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # print('returncode: ', returnCode)
             settings = dialog.get_settings()
             # print(settings)
-    
 
         self.action_Options.triggered.connect(options_dialog)
 
-        #enable menu items
+        # enable menu items
         self.action_Exit.triggered.connect(self.close)
         self.action_About.triggered.connect(show_about_dialog)
-
 
         # create crsObject containing all available countries and crs codes
         # loadCRS()
@@ -297,11 +297,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             new_col = []
             for i in range(no_rows):
                 new_col.append(float('NaN'))
-            self.data.insert(no_cols,"Column"+str(no_cols),new_col)
-            self.combo_lat.addItem("Column"+str(no_cols))
-            self.combo_lon.addItem("Column"+str(no_cols))
-            self.combo_northing.addItem("Column"+str(no_cols))
-            self.combo_easting.addItem("Column"+str(no_cols))
+            self.data.insert(no_cols, "Column" + str(no_cols), new_col)
+            self.combo_lat.addItem("Column" + str(no_cols))
+            self.combo_lon.addItem("Column" + str(no_cols))
+            self.combo_northing.addItem("Column" + str(no_cols))
+            self.combo_easting.addItem("Column" + str(no_cols))
 
             model = TableModel(self.data)
             self.tableview.setModel(model)
@@ -327,7 +327,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             showWKT(crs)
 
-
         def showRightWKT():
 
             coord_system = self.right_coord_sys.currentText()
@@ -352,7 +351,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             showWKT(crs)
 
- 
         self.lWkt.clicked.connect(showLeftWKT)
         self.rWkt.clicked.connect(showRightWKT)
 
@@ -364,7 +362,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.northing.setText('')
         self.easting.setText('')
         self.statusBar().showMessage('')
-
 
     def updateLeftCRS(self, text):
         self.left_crs_select.clear()
@@ -424,7 +421,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         crs_to = crsObject[coord_system][crs_name][0]
         crs_to_type = crsObject[coord_system][crs_name][1]
 
-        # checkto see that inputs are valid...
+        # check to see that inputs are valid...
         if crs_from_type == 'geographic':
             pass
 
@@ -432,7 +429,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # if self.optDms.isChecked():
         dms_format = settings['ang_fmt']
         precision = settings['ang_prec']
-        
+
         lin_format = settings['lin_fmt']
 
         # Display EPSG codes  for conversion in status bar
@@ -510,7 +507,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         settings['right_coord'] = right_coord
         settings['right_crs'] = right_crs
 
-        with open('coordsys.ini','wb') as f:
+        with open('coordsys.ini', 'wb') as f:
             pickle.dump(settings, f)
 
     def convertFile(self):
@@ -531,7 +528,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         dms_format = settings['ang_fmt']
         precision = settings['ang_prec']
         lin_format = settings['lin_fmt']
-        
 
         # crs_from = 4326
         # crs_to = 3124
@@ -551,13 +547,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for row in self.data.index:
             if crs_from_type == 'geographic':
                 lat = parseDMS(self.data.loc[row, lat_col])
-                lon = parseDMS(self.data.loc[row,lon_col])
+                lon = parseDMS(self.data.loc[row, lon_col])
                 # make input column formats reflect user seleccted format
                 self.data.loc[row, lat_col] = latDMS(lat, form=dms_format, prec=precision)
                 self.data.loc[row, lon_col] = latDMS(lon, form=dms_format, prec=precision)
             else:
-                lon = self.data.loc[row,lat_col]
-                lat = self.data.at[row,lon_col]
+                lon = self.data.loc[row, lat_col]
+                lat = self.data.at[row, lon_col]
             results = trans.transform(lat, lon, errcheck=True)
             if crs_to_type == 'geographic':
                 # set column data type to string
@@ -569,9 +565,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.data.loc[row, northing_col] = lat_dms
                 self.data.loc[row, easting_col] = lon_dms
 
-            else: 
+            else:
                 self.data.loc[row, northing_col] = lin_format.format(results[1])
-                self.data.loc[row,easting_col] = lin_format.format(results[0])
+                self.data.loc[row, easting_col] = lin_format.format(results[0])
         # reset the model to show the newly computed values
         model = TableModel(self.data)
         self.tableview.setModel(model)
@@ -582,7 +578,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         settings['right_coord'] = right_coord
         settings['right_crs'] = right_crs
 
-        with open('coordsys.ini','wb') as f:
+        with open('coordsys.ini', 'wb') as f:
             pickle.dump(settings, f)
 
     def get_left_crs_type(self, text):
@@ -590,7 +586,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             left_crs_type = crsObject[self.left_coord_sys.currentText()][text][1]
         else:
             left_crs_type = text
-        
+
         if left_crs_type:
             if left_crs_type == 'geographic':
                 self.lLat.setText('Latitude')
@@ -606,7 +602,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             right_crs_type = crsObject[self.right_coord_sys.currentText()][text][1]
         else:
             right_crs_type = text
-        if text!= '':
+        if text != '':
             if right_crs_type == 'geographic':
                 self.rLat.setText('Latitude')
                 self.rLon.setText('Longitude')
@@ -639,6 +635,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             else:
                 self.label_northing.setText('Northing')
                 self.label_easting.setText('Easting')
+
 
 app = QApplication(sys.argv)
 qss = 'custom.css'
