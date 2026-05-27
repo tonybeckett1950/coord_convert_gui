@@ -1,17 +1,166 @@
+/* ── Global font ──────────────────────────────────────────────────────────── */
+* {
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 9pt;
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────────── */
 QPushButton {
-    border: 1px solid #8f8f91;
+    border: 1px solid #8a8a8a;
+    border-radius: 4px;
+    padding: 2px 10px;
+    background-color: #e8e8e8;
+    color: #1a1a1a;
+    min-height: 20px;
+}
+QPushButton:hover {
+    background-color: #d4d4d4;
+    border-color: #5a5a5a;
+}
+QPushButton:pressed {
+    background-color: #c0c0c0;
+}
+QPushButton:disabled {
+    color: #a0a0a0;
+    border-color: #c8c8c8;
+    background-color: #f0f0f0;
+}
+
+/* Action buttons - green */
+QPushButton#convert,
+QPushButton#convert_reverse,
+QPushButton#convert_file,
+QPushButton#save_file {
+    background-color: #73D216;
+    color: #1a1a1a;
+    border-color: #52971a;
+    font-weight: bold;
+}
+QPushButton#convert:hover,
+QPushButton#convert_reverse:hover,
+QPushButton#convert_file:hover,
+QPushButton#save_file:hover {
+    background-color: #5eba0c;
+}
+QPushButton#convert:pressed,
+QPushButton#convert_reverse:pressed,
+QPushButton#convert_file:pressed,
+QPushButton#save_file:pressed {
+    background-color: #4ea008;
+}
+
+/* WKT info buttons - steel blue with white text */
+QPushButton#lWkt,
+QPushButton#rWkt,
+QPushButton#lWkt_file,
+QPushButton#rWkt_file {
+    background-color: #729FCF;
+    color: white;
+    border-color: #4a7aaa;
+}
+QPushButton#lWkt:hover,
+QPushButton#rWkt:hover,
+QPushButton#lWkt_file:hover,
+QPushButton#rWkt_file:hover {
+    background-color: #5a8fbf;
+}
+QPushButton#lWkt:pressed,
+QPushButton#rWkt:pressed,
+QPushButton#lWkt_file:pressed,
+QPushButton#rWkt_file:pressed {
+    background-color: #4a7aaa;
+}
+
+/* ── Input widgets ────────────────────────────────────────────────────────── */
+QLineEdit,
+QTextEdit,
+QPlainTextEdit {
+    border: 1px solid #b0b0b0;
+    border-radius: 3px;
+    padding: 1px 4px;
+    background-color: white;
+    selection-background-color: #729FCF;
+    selection-color: white;
+}
+QLineEdit:focus,
+QTextEdit:focus {
+    border-color: #729FCF;
+}
+QLineEdit:read-only {
+    background-color: #f5f5f5;
+    color: #555555;
+}
+
+QComboBox {
+    border: 1px solid #b0b0b0;
+    border-radius: 3px;
+    padding: 1px 4px;
+    background-color: white;
+    selection-background-color: #729FCF;
+}
+QComboBox:focus {
+    border-color: #729FCF;
+}
+QComboBox QAbstractItemView {
+    min-width: 260px;
+    border: 1px solid #b0b0b0;
+    selection-background-color: #729FCF;
+    selection-color: white;
+}
+
+/* ── Group boxes ──────────────────────────────────────────────────────────── */
+QGroupBox {
+    border: 1px solid #b8b8b8;
+    border-radius: 4px;
+    margin-top: 10px;
+    padding-top: 4px;
+}
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    left: 8px;
+    padding: 0 4px;
+    font-weight: bold;
+}
+
+/* ── Tab widget ───────────────────────────────────────────────────────────── */
+QTabWidget::pane {
+    border: 1px solid #b8b8b8;
     border-radius: 3px;
 }
-
-QPushButton:pressed {
-    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                      stop: 0 #dadbde, stop: 1 #f6f7fa);
+QTabBar::tab {
+    padding: 4px 14px;
+    border: 1px solid #b8b8b8;
+    border-bottom: none;
+    border-radius: 3px 3px 0 0;
+    background-color: #e0e0e0;
+    margin-right: 2px;
+}
+QTabBar::tab:selected {
+    background-color: white;
+    font-weight: bold;
+    color: #1a1a1a;
+}
+QTabBar::tab:hover:!selected {
+    background-color: #e8f0f8;
 }
 
-QPushButton:flat {
-    border: none; /* no border for a flat push button */
+/* ── Table / header ───────────────────────────────────────────────────────── */
+QTableView {
+    gridline-color: #d0d0d0;
+    selection-background-color: #729FCF;
+    selection-color: white;
+    alternate-background-color: #f5f8fc;
+}
+QHeaderView::section {
+    background-color: #e8e8e8;
+    border: 1px solid #c8c8c8;
+    padding: 2px 6px;
+    font-weight: bold;
 }
 
-QPushButton:default {
-    border-color: navy; /* make the default button prominent */
+/* ── Status bar ───────────────────────────────────────────────────────────── */
+QStatusBar {
+    border-top: 1px solid #c8c8c8;
+    background-color: #f5f5f5;
 }

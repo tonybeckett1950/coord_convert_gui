@@ -1,0 +1,18 @@
+[project]
+name = "coord-convert-gui"
+version = "1.0.0"
+description = "Coordinate Converter GUI"
+requires-python = ">=3.13"
+dependencies = [
+    "PyQt6>=6.11.0",
+    "pyproj>=3.7.0",
+    "PyGeodesy>=22.6.0",
+    "pandas>=2.0.0",
+    "openpyxl>=3.1.5",
+]
+
+[project.scripts]
+coord-convert = "appCoordConv:main"
+
+[dependency-groups]
+dev = []

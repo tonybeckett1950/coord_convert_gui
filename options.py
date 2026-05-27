@@ -1,157 +1,102 @@
-# -*- coding: utf-8 -*-
-
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QDialog
+from PyQt6 import QtCore, QtGui
+from PyQt6.QtWidgets import (
+    QCheckBox,
+    QDialog,
+    QGroupBox,
+    QLabel,
+    QPushButton,
+    QRadioButton,
+    QSpinBox,
+    QVBoxLayout,
+    QWidget,
+)
 
 
 class OptionsDialog(QDialog):
-    # global settings
 
-    def __init__(self, settings):
-        super(OptionsDialog, self).__init__()   
-        
-        self.settings = settings          
-
-        self.setWindowTitle('Display Formats') 
-        self.setWindowIcon(QtGui.QIcon('globe.png'))
+    def __init__(self, settings: dict) -> None:
+        super().__init__()
+        self.settings = settings
+        self.setWindowTitle("Display Formats")
+        self.setWindowIcon(QtGui.QIcon("globe.png"))
         self.resize(491, 257)
+        self._build_ui()
+        self._load_settings()
 
-        self.groupBox = QtWidgets.QGroupBox(self)
-        self.groupBox.setTitle("Angular Measurements Format")
-        self.groupBox.setGeometry(QtCore.QRect(20, 10, 451, 131))
-        self.groupBox.setObjectName("groupBox")
+    def _build_ui(self) -> None:
+        ang_box = QGroupBox("Angular Measurements Format", self)
+        ang_box.setGeometry(QtCore.QRect(20, 10, 451, 131))
 
-        self.spinD = QtWidgets.QSpinBox(self.groupBox)
+        layout_widget = QWidget(ang_box)
+        layout_widget.setGeometry(QtCore.QRect(10, 30, 196, 83))
+        layout = QVBoxLayout(layout_widget)
+        layout.setContentsMargins(0, 0, 0, 0)
+
+        self.optD = QRadioButton("Degrees", layout_widget)
+        self.optDM = QRadioButton("Degrees minutes", layout_widget)
+        self.optDMS = QRadioButton("Degrees minutes seconds", layout_widget)
+        for btn in (self.optD, self.optDM, self.optDMS):
+            layout.addWidget(btn)
+
+        self.spinD = QSpinBox(ang_box)
         self.spinD.setGeometry(QtCore.QRect(390, 30, 49, 26))
-        self.spinD.setObjectName("spinD")
-
-        self.spinDM = QtWidgets.QSpinBox(self.groupBox)
+        self.spinDM = QSpinBox(ang_box)
         self.spinDM.setGeometry(QtCore.QRect(390, 60, 49, 26))
-        self.spinDM.setObjectName("spinDM")
-
-        self.spinDMS = QtWidgets.QSpinBox(self.groupBox)
+        self.spinDMS = QSpinBox(ang_box)
         self.spinDMS.setGeometry(QtCore.QRect(390, 90, 49, 26))
-        self.spinDMS.setObjectName("spinDMS")
 
-        self.label = QtWidgets.QLabel(self.groupBox)
-        self.label.setGeometry(QtCore.QRect(280, 30, 101, 26))
-        self.label.setObjectName("label")
-        self.label.setText("Decimal places")
+        for y in (30, 60, 90):
+            QLabel("Decimal places", ang_box).setGeometry(
+                QtCore.QRect(280, y, 101, 26)
+            )
 
-        self.label_2 = QtWidgets.QLabel(self.groupBox)
-        self.label_2.setGeometry(QtCore.QRect(280, 60, 101, 26))
-        self.label_2.setObjectName("label_2")
-        self.label_2.setText("Decimal places")
+        lin_box = QGroupBox("Linear Measurements Format", self)
+        lin_box.setGeometry(QtCore.QRect(20, 150, 451, 61))
 
-        self.label_3 = QtWidgets.QLabel(self.groupBox)
-        self.label_3.setGeometry(QtCore.QRect(280, 90, 101, 26))
-        self.label_3.setObjectName("label_3")
-        self.label_3.setText("Decimal places")
-
-        self.layoutWidget = QtWidgets.QWidget(self.groupBox)
-        self.layoutWidget.setGeometry(QtCore.QRect(10, 30, 196, 83))
-        self.layoutWidget.setObjectName("layoutWidget")
-        self.verticalLayout = QtWidgets.QVBoxLayout(self.layoutWidget)
-        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
-        self.verticalLayout.setObjectName("verticalLayout")
-
-        self.optD = QtWidgets.QRadioButton(self.layoutWidget)
-        self.optD.setChecked(True)
-        self.optD.setObjectName("optD")
-        self.optD.setText("Degrees")
-        self.verticalLayout.addWidget(self.optD)
-
-        self.optDM = QtWidgets.QRadioButton(self.layoutWidget)
-        self.optDM.setObjectName("optDM")
-        self.optDM.setText("Degrees minutes")
-        self.verticalLayout.addWidget(self.optDM)
-        self.optDMS = QtWidgets.QRadioButton(self.layoutWidget)
-
-        self.optDMS.setObjectName("optDMS")
-        self.optDMS.setText("Degrees minutes seconds")
-        self.verticalLayout.addWidget(self.optDMS)
-
-        if self.settings['ang_fmt'] == 'D':
-            self.spinD.setProperty("value", settings['ang_prec'])
-            self.optD.setChecked(True)
-        else:
-            self.spinD.setProperty("value", 6)
-            self.optD.setChecked(False)
-        
-        if self.settings['ang_fmt'] == 'DM':
-            self.spinDM.setProperty("value", settings['ang_prec'])
-            self.optDM.setChecked(True)
-        else:
-            self.spinDM.setProperty("value", 4)
-            self.optDM.setChecked(False)
-
-        if self.settings['ang_fmt'] == 'DMS':
-            self.spinDMS.setProperty("value", settings['ang_prec'])
-            self.optDMS.setChecked(True)
-        else:
-            self.spinDMS.setProperty("value", 2)
-            self.optDMS.setChecked(False)  
-
-        self.groupBox_2 = QtWidgets.QGroupBox(self)
-        self.groupBox_2.setGeometry(QtCore.QRect(20, 150, 451, 61))
-        self.groupBox_2.setObjectName("groupBox_2")
-        self.groupBox_2.setTitle("Linear Measurements Format")
-
-        self.label_4 = QtWidgets.QLabel(self.groupBox_2)
-        self.label_4.setGeometry(QtCore.QRect(280, 30, 101, 26))
-        self.label_4.setObjectName("label_4")
-        self.label_4.setText("Decimal places")
-
-        self.spinLength = QtWidgets.QSpinBox(self.groupBox_2)
+        QLabel("Decimal places", lin_box).setGeometry(
+            QtCore.QRect(280, 30, 101, 26)
+        )
+        self.spinLength = QSpinBox(lin_box)
         self.spinLength.setGeometry(QtCore.QRect(390, 30, 49, 26))
-        lin_prec = settings['lin_fmt'][-3:-2]
-        self.spinLength.setProperty("value", int(lin_prec))
-        self.spinLength.setObjectName("spinLength")
-
-        self.chkCommas = QtWidgets.QCheckBox(self.groupBox_2)
+        self.chkCommas = QCheckBox("Comma separators", lin_box)
         self.chkCommas.setGeometry(QtCore.QRect(10, 30, 171, 23))
-        if ',' in settings['lin_fmt']:
-            self.chkCommas.setChecked(True)
-        else:
-            self.chkCommas.setChecked(False)
-        self.chkCommas.setObjectName("chkCommas")
-        self.chkCommas.setText("Comma separators")
 
-        self.pushButtonOK = QtWidgets.QPushButton(self)
-        self.pushButtonOK.setGeometry(QtCore.QRect(310, 220, 83, 25))
-        self.pushButtonOK.setObjectName("pushButtonOK")
-        self.pushButtonOK.setText('OK')
+        btn_ok = QPushButton("OK", self)
+        btn_ok.setGeometry(QtCore.QRect(310, 220, 83, 25))
+        btn_ok.clicked.connect(self.accept)
+        btn_cancel = QPushButton("Cancel", self)
+        btn_cancel.setGeometry(QtCore.QRect(70, 220, 83, 25))
+        btn_cancel.clicked.connect(self.reject)
 
-        self.pushButtonCancel = QtWidgets.QPushButton(self)
-        self.pushButtonCancel.setGeometry(QtCore.QRect(70, 220, 83, 25))
-        self.pushButtonCancel.setText('Cancel')
-        self.pushButtonCancel.setObjectName("pushButtonCancel")
+    def _load_settings(self) -> None:
+        ang_fmt = self.settings["ang_fmt"]
+        ang_prec = int(self.settings["ang_prec"])
+        options_map = {
+            "D": (self.optD, self.spinD, 6),
+            "DM": (self.optDM, self.spinDM, 4),
+            "DMS": (self.optDMS, self.spinDMS, 2),
+        }
+        for fmt, (btn, spin, default_prec) in options_map.items():
+            btn.setChecked(ang_fmt == fmt)
+            spin.setValue(ang_prec if ang_fmt == fmt else default_prec)
+        lin_prec = int(self.settings["lin_fmt"][-3:-2])
+        self.spinLength.setValue(lin_prec)
+        self.chkCommas.setChecked("," in self.settings["lin_fmt"])
 
-        self.pushButtonOK.clicked.connect(self.accept)
-        self.pushButtonCancel.clicked.connect(lambda: self.close())
- 
-
-    def accept(self):
-        # print('Exited options dialog with OK')
+    def accept(self) -> None:
         if self.optD.isChecked():
-            self.settings['ang_fmt'] = 'D'
-            self.settings['ang_prec'] = self.spinD.value()
+            self.settings["ang_fmt"] = "D"
+            self.settings["ang_prec"] = self.spinD.value()
         elif self.optDM.isChecked():
-            self.settings['ang_fmt'] = 'DM'
-            self.settings['ang_prec'] = self.spinDM.value()
+            self.settings["ang_fmt"] = "DM"
+            self.settings["ang_prec"] = self.spinDM.value()
         else:
-            self.settings['ang_fmt'] = 'DMS'
-            self.settings['ang_prec'] = self.spinDMS.value()
+            self.settings["ang_fmt"] = "DMS"
+            self.settings["ang_prec"] = self.spinDMS.value()
+        prec = self.spinLength.value()
+        sep = ",." if self.chkCommas.isChecked() else "."
+        self.settings["lin_fmt"] = f"{{0:{sep}{prec}f}}"
+        super().accept()
 
-        lin_prec = str(self.spinLength.value()) + 'f'
-        if self.chkCommas.isChecked():
-            self.settings['lin_fmt'] = '{0:,.' + lin_prec + '}'
-        else:
-            self.settings['lin_fmt'] = '{0:.' + lin_prec + '}'
-        
-        self.close()
-
-
-    def get_settings(self):
+    def get_settings(self) -> dict:
         return self.settings
-

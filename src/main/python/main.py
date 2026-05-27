@@ -1,16 +1,16 @@
-from fbs_runtime.application_context.PyQt5 import ApplicationContext
+# from fbs_runtime.application_context.PyQt5 import ApplicationContext
 
 import sys
-from PyQt5.QtWidgets import QStatusBar, QMainWindow, QApplication, QMessageBox
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon
-from PyQt5 import uic
+from PyQt6.QtWidgets import QStatusBar, QMainWindow, QApplication, QMessageBox
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QIcon
+from PyQt6 import uic
 import sqlite3
 from pyproj import Transformer, CRS, datadir, _datadir
 from pygeodesy.dms import parseDMS, latDMS, lonDMS
 import pickle
 
-appctxt = ApplicationContext()       # 1. Instantiate ApplicationContext
+# appctxt = ApplicationContext()       # 1. Instantiate ApplicationContext
 
 crsObject = {}
 qt_creator_file = "mainwindow.ui"
@@ -85,21 +85,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # load the two country combo boxes.
         # make them default to the values saved in coordsys.ini'
         self.left_coord_sys.addItems(countries_list)
-        index = self.left_coord_sys.findText(left_coord, Qt.MatchFixedString)
+        index = self.left_coord_sys.findText(left_coord, Qt.MatchFlag.MatchFixedString)
 
         self.left_coord_sys.setCurrentIndex(index)
         self.updateLeftCRS(left_coord)
 
-        index = self.left_crs_select.findText(left_crs, Qt.MatchFixedString)
+        index = self.left_crs_select.findText(left_crs, Qt.MatchFlag.MatchFixedString)
         self.left_crs_select.setCurrentIndex(index)
 
         self.right_coord_sys.addItems(countries_list)
-        index = self.right_coord_sys.findText(right_coord, Qt.MatchFixedString)
+        index = self.right_coord_sys.findText(right_coord, Qt.MatchFlag.MatchFixedString)
 
         self.right_coord_sys.setCurrentIndex(index)
         self.updateRightCRS(right_coord)
 
-        index = self.right_crs_select.findText(right_crs, Qt.MatchFixedString)
+        index = self.right_crs_select.findText(right_crs, Qt.MatchFlag.MatchFixedString)
         self.right_crs_select.setCurrentIndex(index)
         # self.updateRightCRS(countries_list[0])
 
@@ -314,5 +314,5 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 window = MainWindow()
 window.show()
 
-exit_code = appctxt.app.exec_()      # 2. Invoke appctxt.app.exec_()
+exit_code = appctxt.app.exec()      # 2. Invoke appctxt.app.exec()
 sys.exit(exit_code)

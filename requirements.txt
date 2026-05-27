@@ -1,0 +1,15 @@
+# Core dependencies
+PyQt6==6.11.0
+PyQt6-Qt6==6.11.1
+PyQt6_sip==13.11.1
+pyproj==3.7.2
+PyGeodesy==22.6.22
+pandas==3.0.3
+
+# Transitive dependencies
+certifi==2022.6.15
+numpy==2.4.6
+python-dateutil==2.8.2
+pytz==2022.1
+six==1.16.0
+tzdata==2024.2
