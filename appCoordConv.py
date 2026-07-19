@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import pathlib
 import pickle
 import sqlite3
@@ -1566,4 +1565,3 @@ with open(qss, 'r') as f:
 window = MainWindow()
 window.show()
 app.exec_()
->>>>>>> fdb73dce8fe9c9ec7ba71720b43b04784a90bcd3
