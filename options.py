@@ -20,7 +20,7 @@ class OptionsDialog(QDialog):
         super().__init__()
         self.settings = settings
         self.setWindowTitle("Display Formats")
-        resources = pathlib.Path(__file__).resolve().parent.parent / "resources" / "base"
+        resources = pathlib.Path(__file__).resolve().parent / "resources"
         self.setWindowIcon(QtGui.QIcon(str(resources / "globe.png")))
         self.resize(491, 257)
         self._build_ui()

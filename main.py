@@ -21,13 +21,13 @@ from pyproj import CRS, Transformer
 
 try:
     from . import options
-    from .ui_mainwindow import Ui_MainWindow  # generated: pyside6-uic mainwindow.ui -o ui_mainwindow.py
+    from .ui_mainwindow import Ui_MainWindow  # generated: pyside6-uic resources/mainwindow.ui -o ui_mainwindow.py
 except ImportError:
     import options
     from ui_mainwindow import Ui_MainWindow
 
 _CRS_DB: dict = {}
-_RESOURCE_DIR = pathlib.Path(__file__).resolve().parent.parent / "resources" / "base"
+_RESOURCE_DIR = pathlib.Path(__file__).resolve().parent / "resources"
 _DB_FILE = _RESOURCE_DIR / "crs.db"
 _SETTINGS_FILE = _RESOURCE_DIR / "coordsys.ini"
 _ICON_FILE = str(_RESOURCE_DIR / "globe.png")

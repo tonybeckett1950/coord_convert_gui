@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [project.scripts]
-coord-convert = "src.main.python.main:main"
+coord-convert = "main:main"
 
 [dependency-groups]
 dev = []
