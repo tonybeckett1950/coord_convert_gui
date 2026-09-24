@@ -1,7 +1,10 @@
+import html
+import json
+import os
 import pathlib
-import pickle
 import sqlite3
 import sys
+from functools import lru_cache
 
 import pandas as pd
 from PySide6 import QtCore
@@ -19,17 +22,12 @@ from PySide6.QtWidgets import (
 from pygeodesy.dms import latDMS, lonDMS, parseDMS
 from pyproj import CRS, Transformer
 
-try:
-    from . import options
-    from .ui_mainwindow import Ui_MainWindow  # generated: pyside6-uic resources/mainwindow.ui -o ui_mainwindow.py
-except ImportError:
-    import options
-    from ui_mainwindow import Ui_MainWindow
+import options
+from ui_mainwindow import Ui_MainWindow  # generated: pyside6-uic resources/mainwindow.ui -o ui_mainwindow.py
 
 _CRS_DB: dict = {}
 _RESOURCE_DIR = pathlib.Path(__file__).resolve().parent / "resources"
 _DB_FILE = _RESOURCE_DIR / "crs.db"
-_SETTINGS_FILE = _RESOURCE_DIR / "coordsys.ini"
 _ICON_FILE = str(_RESOURCE_DIR / "globe.png")
 _ABOUT_IMAGE_FILE = (_RESOURCE_DIR / "globe.jfif").as_posix()
 _STYLE_FILE = _RESOURCE_DIR / "custom.css"
@@ -41,7 +39,8 @@ _DEFAULT_SETTINGS: dict = {
     "right_crs": "WGS 84 / UTM zone 1N",
     "ang_fmt": "DMS",
     "ang_prec": 2,
-    "lin_fmt": "{0:,.3f}",
+    "lin_prec": 3,
+    "lin_commas": True,
 }
 
 # Keywords used to auto-detect which file column maps to which coordinate field.
@@ -65,23 +64,69 @@ def load_crs() -> dict:
     return crs_db
 
 
+def _settings_file() -> pathlib.Path:
+    """Per-user settings location (JSON) -- kept out of the app directory."""
+    if sys.platform == "win32":
+        base = pathlib.Path(
+            os.environ.get("APPDATA", str(pathlib.Path.home() / "AppData" / "Roaming"))
+        )
+    elif sys.platform == "darwin":
+        base = pathlib.Path.home() / "Library" / "Application Support"
+    else:
+        base = pathlib.Path(
+            os.environ.get("XDG_CONFIG_HOME", str(pathlib.Path.home() / ".config"))
+        )
+    return base / "coord_convert_gui" / "settings.json"
+
+
 def load_settings() -> dict:
+    """Load settings, falling back to defaults for missing or invalid entries."""
+    settings = _DEFAULT_SETTINGS.copy()
     try:
-        with open(_SETTINGS_FILE, "rb") as f:
-            saved = pickle.load(f)
-        if "left_coord" in saved:
-            return saved
-    except (FileNotFoundError, pickle.UnpicklingError):
-        pass
-    return _DEFAULT_SETTINGS.copy()
+        with open(_settings_file(), encoding="utf-8") as f:
+            saved = json.load(f)
+    except (OSError, ValueError):
+        return settings
+    if isinstance(saved, dict):
+        for key, default in _DEFAULT_SETTINGS.items():
+            value = saved.get(key)
+            if type(value) is type(default):
+                settings[key] = value
+    return settings
 
 
 def save_settings(settings: dict) -> None:
+    path = _settings_file()
     try:
-        with open(_SETTINGS_FILE, "wb") as f:
-            pickle.dump(settings, f)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(settings, f, indent=2)
     except OSError:
         pass  # Settings are non-critical; silently skip if the file is unwritable
+
+
+def linear_format(settings: dict) -> str:
+    """Build the format string for linear values from display-format settings."""
+    sep = ",." if settings.get("lin_commas") else "."
+    return f"{{0:{sep}{int(settings.get('lin_prec', 3))}f}}"
+
+
+@lru_cache(maxsize=None)
+def _crs_area(epsg):
+    """Cached (crs_name, area_name, (south, north, west, east)) for an EPSG code.
+
+    Returns None if the code cannot be resolved; the area fields are None when
+    the CRS has no defined area of use. Cached because bounds checks consult
+    the whole CRS database and this data is static for the life of the process.
+    """
+    try:
+        crs = CRS.from_user_input(epsg)
+    except Exception:
+        return None
+    aou = crs.area_of_use
+    if aou is None:
+        return (crs.name, None, None)
+    return (crs.name, aou.name, (aou.south, aou.north, aou.west, aou.east))
 
 
 class TableModel(QtCore.QAbstractTableModel):
@@ -341,10 +386,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             crs = CRS.from_user_input(epsg_code)
             self._message_box(
                 f"Well Known Text for EPSG:{epsg_code}",
-                crs.to_wkt(pretty=True),
+                html.escape(crs.to_wkt(pretty=True)),
             )
         except Exception as exc:
-            self._message_box("Error", f"Cannot retrieve WKT:\n{exc}")
+            self._message_box("Error", f"Cannot retrieve WKT:\n{html.escape(str(exc))}")
 
     # ── slots ────────────────────────────────────────────────────────────────
 
@@ -416,8 +461,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 else pd.read_csv(path)
             )
         except Exception as exc:
-            self._message_box("File Error", f"Failed to open file:\n{exc}")
+            self._message_box("File Error", f"Failed to open file:\n{html.escape(str(exc))}")
             return
+        # Normalise non-string column names (e.g. numeric headers) so combos,
+        # auto-detection and lookups all operate on str labels.
+        self.data = self.data.rename(columns=str)
         self.filename.setText(path)
         self._refresh_table()
         columns = [""] + list(self.data.columns)
@@ -445,7 +493,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             else:
                 self.data.to_csv(path, index=False)
         except Exception as exc:
-            self._message_box("File Error", f"Failed to save file:\n{exc}")
+            self._message_box("File Error", f"Failed to save file:\n{html.escape(str(exc))}")
 
     def _open_options(self) -> None:
         dialog = options.OptionsDialog(self.settings)
@@ -453,7 +501,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.settings = dialog.get_settings()
 
     def _add_column(self) -> None:
-        col_name = f"Column{len(self.data.columns)}"
+        existing = {str(c) for c in self.data.columns}
+        n = len(self.data.columns)
+        while f"Column{n}" in existing:
+            n += 1
+        col_name = f"Column{n}"
         self.data[col_name] = float("nan")
         for combo in (
             self.combo_lat, self.combo_lon,
@@ -581,12 +633,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             except Exception:
                 return []
 
-        def _in_bounds(aou) -> tuple[bool, bool]:
-            lat_ok = aou.south <= geo_lat <= aou.north
-            if aou.west <= aou.east:
-                lon_ok = aou.west <= geo_lon <= aou.east
+        def _in_bounds(aou: tuple[float, float, float, float]) -> tuple[bool, bool]:
+            south, north, west, east = aou
+            lat_ok = south <= geo_lat <= north
+            if west <= east:
+                lon_ok = west <= geo_lon <= east
             else:
-                lon_ok = geo_lon >= aou.west or geo_lon <= aou.east
+                lon_ok = geo_lon >= west or geo_lon <= east
             return lat_ok, lon_ok
 
         outside: list[dict] = []
@@ -594,75 +647,67 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             (crs_from, "source", crs_from_type),
             (crs_to, "target", crs_to_type),
         ):
-            try:
-                crs_obj = CRS.from_user_input(epsg)
-                aou = crs_obj.area_of_use
-                if aou is None:
-                    continue
-                lat_ok, lon_ok = _in_bounds(aou)
-                if lat_ok and lon_ok:
-                    continue
-                # Derive the datum/family prefix for prioritisation
-                # e.g. "WGS 84" from "WGS 84 / UTM zone 31N"
-                _full_name = crs_obj.name
-                _family = _full_name.split(" / ")[0].strip()
-                # Search _CRS_DB: bucket into same-family (priority) and others
-                _priority: list[tuple[float, str]] = []  # (dist_to_point, label)
-                _other: list[str] = []
-                for country, entries in _CRS_DB.items():
-                    for crs_name, (s_epsg, s_type) in entries.items():
-                        if s_type != crs_to_type:
-                            continue
-                        try:
-                            s_crs = CRS.from_user_input(s_epsg)
-                            s_aou = s_crs.area_of_use
-                            if s_aou is None:
-                                continue
-                            s_lat_ok, s_lon_ok = _in_bounds(s_aou)
-                            if s_lat_ok and s_lon_ok:
-                                entry_str = (
-                                    f"{crs_name} \u2014 {country} (EPSG:{s_epsg})"
-                                )
-                                if _family and s_crs.name.startswith(_family):
-                                    # Sort same-family by distance from bbox
-                                    # centre to the input point so the most
-                                    # geographically relevant zone comes first.
-                                    c_lat = (s_aou.south + s_aou.north) / 2
-                                    if s_aou.west <= s_aou.east:
-                                        c_lon = (s_aou.west + s_aou.east) / 2
-                                    else:  # crosses antimeridian
-                                        c_lon = (s_aou.west + s_aou.east + 360) / 2
-                                        if c_lon > 180:
-                                            c_lon -= 360
-                                    dist = (
-                                        (c_lat - geo_lat) ** 2
-                                        + (c_lon - geo_lon) ** 2
-                                    ) ** 0.5
-                                    _priority.append((dist, entry_str))
-                                elif len(_other) < 5:
-                                    _other.append(entry_str)
-                        except Exception:
-                            pass
-                _priority.sort(key=lambda x: x[0])
-                suggestions = [s for _, s in _priority[:5]] + _other
-                suggestions = suggestions[:5]
-                outside.append({
-                    "label": label,
-                    "epsg": epsg,
-                    "crs_type": crs_type,
-                    "aou_name": aou.name,
-                    "south": aou.south,
-                    "north": aou.north,
-                    "west": aou.west,
-                    "east": aou.east,
-                    "lat_ok": lat_ok,
-                    "lon_ok": lon_ok,
-                    "geo_lat": geo_lat,
-                    "geo_lon": geo_lon,
-                    "suggestions": suggestions,
-                })
-            except Exception:
-                pass
+            info = _crs_area(epsg)
+            if info is None:
+                continue
+            name, aou_name, aou = info
+            if aou is None:
+                continue
+            lat_ok, lon_ok = _in_bounds(aou)
+            if lat_ok and lon_ok:
+                continue
+            # Derive the datum/family prefix for prioritisation
+            # e.g. "WGS 84" from "WGS 84 / UTM zone 31N"
+            family = name.split(" / ")[0].strip()
+            # Search _CRS_DB: bucket into same-family (priority) and others
+            priority: list[tuple[float, str]] = []  # (dist_to_point, label)
+            other: list[str] = []
+            for country, entries in _CRS_DB.items():
+                for crs_name, (s_epsg, s_type) in entries.items():
+                    if s_type != crs_to_type:
+                        continue
+                    s_info = _crs_area(s_epsg)
+                    if s_info is None or s_info[2] is None:
+                        continue
+                    s_name, _, s_aou = s_info
+                    s_lat_ok, s_lon_ok = _in_bounds(s_aou)
+                    if not (s_lat_ok and s_lon_ok):
+                        continue
+                    entry_str = f"{crs_name} \u2014 {country} (EPSG:{s_epsg})"
+                    if family and s_name.startswith(family):
+                        # Sort same-family by distance from bbox centre to the
+                        # input point so the most geographically relevant zone
+                        # comes first.
+                        south, north, west, east = s_aou
+                        c_lat = (south + north) / 2
+                        if west <= east:
+                            c_lon = (west + east) / 2
+                        else:  # crosses antimeridian
+                            c_lon = (west + east + 360) / 2
+                            if c_lon > 180:
+                                c_lon -= 360
+                        dist = ((c_lat - geo_lat) ** 2 + (c_lon - geo_lon) ** 2) ** 0.5
+                        priority.append((dist, entry_str))
+                    elif len(other) < 5:
+                        other.append(entry_str)
+            priority.sort(key=lambda x: x[0])
+            suggestions = ([s for _, s in priority[:5]] + other)[:5]
+            south, north, west, east = aou
+            outside.append({
+                "label": label,
+                "epsg": epsg,
+                "crs_type": crs_type,
+                "aou_name": aou_name,
+                "south": south,
+                "north": north,
+                "west": west,
+                "east": east,
+                "lat_ok": lat_ok,
+                "lon_ok": lon_ok,
+                "geo_lat": geo_lat,
+                "geo_lon": geo_lon,
+                "suggestions": suggestions,
+            })
         return outside
 
     def _format_bounds_warning(self, violations: list[dict]) -> str:
@@ -732,7 +777,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.clearNorthEast()
         dms_format = self.settings["ang_fmt"]
         precision = self.settings["ang_prec"]
-        lin_format = self.settings["lin_fmt"]
+        lin_format = linear_format(self.settings)
         self.statusBar().showMessage(
             f"Coordinate transform from EPSG {crs_from} to EPSG {crs_to}"
         )
@@ -819,7 +864,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return
         dms_format = self.settings["ang_fmt"]
         precision = self.settings["ang_prec"]
-        lin_format = self.settings["lin_fmt"]
+        lin_format = linear_format(self.settings)
         try:
             trans = Transformer.from_crs(crs_from, crs_to)
         except Exception as exc:
@@ -872,12 +917,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 if crs_from_type == "geographic":
                     lat = parseDMS(self.data.loc[row, lat_col])
                     lon = parseDMS(self.data.loc[row, lon_col])
-                    self.data.loc[row, lat_col] = latDMS(
-                        lat, form=dms_format, prec=precision
-                    )
-                    self.data.loc[row, lon_col] = lonDMS(
-                        lon, form=dms_format, prec=precision
-                    )
                 else:
                     lon = self.data.loc[row, lat_col]
                     lat = self.data.loc[row, lon_col]
@@ -896,7 +935,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 errors.append(f"Row {row + 1}: {exc}")
         self._refresh_table()
         if errors:
-            preview = "\n".join(errors[:10])
+            preview = html.escape("\n".join(errors[:10]))
             suffix = f"\n\u2026and {len(errors) - 10} more" if len(errors) > 10 else ""
             self._message_box(
                 "Conversion Errors",
@@ -911,7 +950,9 @@ def main() -> None:
     try:
         _CRS_DB = load_crs()
     except Exception as exc:
-        QMessageBox.critical(None, "Startup Error", f"Cannot load CRS database:\n{exc}")
+        QMessageBox.critical(
+            None, "Startup Error", f"Cannot load CRS database:\n{html.escape(str(exc))}"
+        )
         sys.exit(1)
     settings = load_settings()
     try:

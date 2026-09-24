@@ -82,9 +82,8 @@ class OptionsDialog(QDialog):
         for fmt, (btn, spin, default_prec) in options_map.items():
             btn.setChecked(ang_fmt == fmt)
             spin.setValue(ang_prec if ang_fmt == fmt else default_prec)
-        lin_prec = int(self.settings["lin_fmt"][-3:-2])
-        self.spinLength.setValue(lin_prec)
-        self.chkCommas.setChecked("," in self.settings["lin_fmt"])
+        self.spinLength.setValue(int(self.settings["lin_prec"]))
+        self.chkCommas.setChecked(bool(self.settings["lin_commas"]))
 
     def accept(self) -> None:
         if self.optD.isChecked():
@@ -96,9 +95,8 @@ class OptionsDialog(QDialog):
         else:
             self.settings["ang_fmt"] = "DMS"
             self.settings["ang_prec"] = self.spinDMS.value()
-        prec = self.spinLength.value()
-        sep = ",." if self.chkCommas.isChecked() else "."
-        self.settings["lin_fmt"] = f"{{0:{sep}{prec}f}}"
+        self.settings["lin_prec"] = self.spinLength.value()
+        self.settings["lin_commas"] = self.chkCommas.isChecked()
         super().accept()
 
     def get_settings(self) -> dict:
