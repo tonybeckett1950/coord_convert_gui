@@ -1,7 +1,7 @@
 import pathlib
 
-from PyQt6 import QtCore, QtGui
-from PyQt6.QtWidgets import (
+from PySide6 import QtCore, QtGui
+from PySide6.QtWidgets import (
     QCheckBox,
     QDialog,
     QGroupBox,

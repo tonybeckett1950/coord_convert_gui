@@ -1,0 +1,12 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+
+# IDE
+.idea/
+
+# Build output (FBS / PyInstaller)
+target/

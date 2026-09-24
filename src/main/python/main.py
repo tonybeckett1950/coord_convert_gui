@@ -4,10 +4,10 @@ import sqlite3
 import sys
 
 import pandas as pd
-from PyQt6 import QtCore, uic
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QIcon
-from PyQt6.QtWidgets import (
+from PySide6 import QtCore
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import (
     QApplication,
     QFileDialog,
     QMainWindow,
@@ -21,24 +21,24 @@ from pyproj import CRS, Transformer
 
 try:
     from . import options
+    from .ui_mainwindow import Ui_MainWindow  # generated: pyside6-uic mainwindow.ui -o ui_mainwindow.py
 except ImportError:
     import options
+    from ui_mainwindow import Ui_MainWindow
 
 _CRS_DB: dict = {}
 _RESOURCE_DIR = pathlib.Path(__file__).resolve().parent.parent / "resources" / "base"
-_UI_FILE = str(_RESOURCE_DIR / "mainwindow.ui")
 _DB_FILE = _RESOURCE_DIR / "crs.db"
 _SETTINGS_FILE = _RESOURCE_DIR / "coordsys.ini"
 _ICON_FILE = str(_RESOURCE_DIR / "globe.png")
 _ABOUT_IMAGE_FILE = (_RESOURCE_DIR / "globe.jfif").as_posix()
 _STYLE_FILE = _RESOURCE_DIR / "custom.css"
-Ui_MainWindow, _ = uic.loadUiType(_UI_FILE)
 
 _DEFAULT_SETTINGS: dict = {
     "left_coord": "World",
     "right_coord": "World",
     "left_crs": "WGS 84",
-    "right_crs": "WGS 84 / Zone 1N",
+    "right_crs": "WGS 84 / UTM zone 1N",
     "ang_fmt": "DMS",
     "ang_prec": 2,
     "lin_fmt": "{0:,.3f}",
