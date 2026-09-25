@@ -13,7 +13,20 @@ dependencies = [
 ]
 
 [project.scripts]
-coord-convert = "main:main"
+coord-convert = "coord_convert_gui.main:main"
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+# Only the application package is importable; data/, icons/ and resources/ are
+# plain content directories at the repository root.
+[tool.setuptools.packages.find]
+include = ["coord_convert_gui*"]
 
 [dependency-groups]
 dev = []
+
+[tool.uv]
+# Install the project itself (editable) so the `coord-convert` entry point works.
+package = true

@@ -1,1063 +1,468 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>1030</width>
-    <height>540</height>
-   </rect>
-  </property>
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-    <horstretch>0</horstretch>
-    <verstretch>0</verstretch>
-   </sizepolicy>
-  </property>
-  <property name="minimumSize">
-   <size>
-    <width>1030</width>
-    <height>540</height>
-   </size>
-  </property>
-  <property name="maximumSize"><size><width>1030</width><height>16777215</height></size></property><property name="baseSize">
-   <size>
-    <width>760</width>
-    <height>300</height>
-   </size>
-  </property>
-  <property name="windowTitle">
-   <string>Coordinate Converter</string>
-  </property>
+  <property name="geometry"><rect><x>0</x><y>0</y><width>1030</width><height>560</height></rect></property>
+  <property name="minimumSize"><size><width>980</width><height>520</height></size></property>
+  <property name="windowTitle"><string>Coordinate Converter</string></property>
   <widget class="QWidget" name="centralwidget">
-   <property name="sizePolicy">
-    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-     <horstretch>0</horstretch>
-     <verstretch>0</verstretch>
-    </sizepolicy>
-   </property>
-   <layout class="QVBoxLayout" name="mainLayout"><property name="margin"><number>0</number></property><property name="leftMargin"><number>0</number></property><property name="topMargin"><number>0</number></property><property name="rightMargin"><number>0</number></property><property name="bottomMargin"><number>0</number></property><item><widget class="QTabWidget" name="tabWidget">
-    <property name="tabShape">
-     <enum>QTabWidget::Rounded</enum>
-    </property>
-    <property name="currentIndex">
-     <number>0</number>
-    </property>
-    <widget class="QWidget" name="interactive">
-     <attribute name="title">
-      <string>Interactive</string>
-     </attribute>
-     <widget class="QPushButton" name="convert">
-      <property name="geometry">
-       <rect>
-        <x>470</x>
-        <y>88</y>
-        <width>90</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background-color: #73D216;</string>
-      </property>
-      <property name="text">
-       <string>Convert &gt;</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="convert_reverse">
-      <property name="geometry">
-       <rect>
-        <x>470</x>
-        <y>120</y>
-        <width>90</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background-color: #73D216;</string>
-      </property>
-      <property name="text">
-       <string>&lt; Convert</string>
-      </property>
-     </widget>
-     <widget class="QWidget" name="layoutWidget">
-      <property name="geometry">
-       <rect>
-        <x>600</x>
-        <y>12</y>
-        <width>411</width>
-        <height>240</height>
-       </rect>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item>
-        <widget class="QGroupBox" name="groupBox_3">
-         <property name="title">
-          <string>Output Coordinates</string>
-         </property>
-         <widget class="QWidget" name="layoutWidget">
-          <property name="geometry">
-           <rect>
-            <x>30</x>
-            <y>30</y>
-            <width>291</width>
-            <height>58</height>
-           </rect>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_2">
-           <item row="0" column="0">
-            <widget class="QLabel" name="rLat">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>100</width>
-               <height>21</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Northing</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLineEdit" name="northing">
-             <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="rLon">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>100</width>
-               <height>21</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Easting</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLineEdit" name="easting">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="groupBox_8">
-         <property name="title">
-          <string>Output Coordinate System</string>
-         </property>
-         <widget class="QWidget" name="layoutWidget">
-          <property name="geometry">
-           <rect>
-            <x>30</x>
-            <y>30</y>
-            <width>374</width>
-            <height>58</height>
-           </rect>
-          </property>
-          <layout class="QGridLayout" name="gridLayout">
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_7">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>100</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Country/Region</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QComboBox" name="right_coord_sys">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>260</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>260</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <property name="baseSize">
-              <size>
-               <width>260</width>
-               <height>0</height>
-              </size>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_8">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>100</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>CRS</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QComboBox" name="right_crs_select">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>260</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>260</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <property name="baseSize">
-              <size>
-               <width>260</width>
-               <height>0</height>
-              </size>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        <property name="minimumSize"><size><width>0</width><height>130</height></size></property><widget class="QPushButton" name="rWkt">
-             <property name="geometry"><rect><x>160</x><y>100</y><width>90</width><height>26</height></rect></property><property name="minimumSize">
-              <size>
-               <width>90</width>
-               <height>26</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>90</width>
-               <height>26</height>
-              </size>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">background-color: #729FCF; color: white;</string>
-             </property>
-             <property name="text">
-              <string>WKT</string>
-             </property>
-            </widget>
-           </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="layoutWidget">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>10</y>
-        <width>411</width>
-        <height>240</height>
-       </rect>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <widget class="QGroupBox" name="groupBox_4">
-         <property name="title">
-          <string>Input Coordinates</string>
-         </property>
-         <widget class="QWidget" name="layoutWidget_3">
-          <property name="geometry">
-           <rect>
-            <x>30</x>
-            <y>30</y>
-            <width>291</width>
-            <height>58</height>
-           </rect>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_4">
-           <item row="0" column="0">
-            <widget class="QLabel" name="lLat">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>100</width>
-               <height>21</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Northing</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLineEdit" name="latitude">
-             <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="lLon">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>100</width>
-               <height>21</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Easting</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLineEdit" name="longitude">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="groupBox_9">
-         <property name="title">
-          <string>Input Coordinate System</string>
-         </property>
-         <widget class="QWidget" name="layoutWidget_2">
-          <property name="geometry">
-           <rect>
-            <x>30</x>
-            <y>30</y>
-            <width>374</width>
-            <height>58</height>
-           </rect>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_3">
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_11">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>100</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Country/Region</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QComboBox" name="left_coord_sys">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>260</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>260</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <property name="baseSize">
-              <size>
-               <width>260</width>
-               <height>0</height>
-              </size>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_12">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>100</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>CRS</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QComboBox" name="left_crs_select">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>260</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>260</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <property name="baseSize">
-              <size>
-               <width>260</width>
-               <height>0</height>
-              </size>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        <property name="minimumSize"><size><width>0</width><height>130</height></size></property><widget class="QPushButton" name="lWkt">
-             <property name="geometry"><rect><x>160</x><y>100</y><width>90</width><height>26</height></rect></property><property name="minimumSize">
-              <size>
-               <width>90</width>
-               <height>26</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>90</width>
-               <height>26</height>
-              </size>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">background-color: #729FCF; color: white;</string>
-             </property>
-             <property name="text">
-              <string>WKT</string>
-             </property>
-            </widget>
-           </widget>
-       </item>
-      </layout>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="point_file">
-     <attribute name="title">
-      <string>Point File</string>
-     </attribute>
-     <widget class="QGroupBox" name="groupBox_10">
-      <property name="geometry">
-       <rect>
-        <x>580</x>
-        <y>260</y>
-        <width>421</width>
-        <height>200</height>
-       </rect>
-      </property>
-      <property name="title">
-       <string>Output Coordinate System</string>
-      </property>
-      <widget class="QWidget" name="layoutWidget_4">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>30</y>
-         <width>381</width>
-         <height>120</height>
-        </rect>
-       </property>
-       <layout class="QGridLayout" name="gridLayout_5">
-        <item row="1" column="1">
-         <widget class="QComboBox" name="right_crs_select_file">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>260</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>260</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="baseSize">
-           <size>
-            <width>260</width>
-            <height>0</height>
-           </size>
-          </property>
-         </widget>
-        </item>
+   <layout class="QVBoxLayout" name="mainLayout">
+    <property name="leftMargin"><number>0</number></property>
+    <property name="topMargin"><number>0</number></property>
+    <property name="rightMargin"><number>0</number></property>
+    <property name="bottomMargin"><number>0</number></property>
+    <item>
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="tabShape"><enum>QTabWidget::Rounded</enum></property>
+      <property name="currentIndex"><number>0</number></property>
+      <widget class="QWidget" name="interactive">
+       <attribute name="title"><string>Interactive</string></attribute>
+       <layout class="QGridLayout" name="gridLayout_interactive">
         <item row="0" column="0">
-         <widget class="QLabel" name="label_9">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>100</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Country/Region</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_10">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>100</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>CRS</string>
-          </property>
-         </widget>
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <item>
+           <widget class="QGroupBox" name="groupBox_4">
+            <property name="title"><string>Input Coordinates</string></property>
+            <layout class="QGridLayout" name="gridLayout_4">
+             <item row="0" column="0">
+              <widget class="QLabel" name="lLat">
+               <property name="minimumSize"><size><width>90</width><height>0</height></size></property>
+               <property name="text"><string>Latitude</string></property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLineEdit" name="latitude">
+               <property name="alignment"><set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set></property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="lLon">
+               <property name="minimumSize"><size><width>90</width><height>0</height></size></property>
+               <property name="text"><string>Longitude</string></property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLineEdit" name="longitude">
+               <property name="alignment"><set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set></property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox_9">
+            <property name="sizePolicy"><sizepolicy hsizetype="Preferred" vsizetype="Expanding"><horstretch>0</horstretch><verstretch>0</verstretch></sizepolicy></property>
+            <property name="title"><string>Input Coordinate System</string></property>
+            <layout class="QGridLayout" name="gridLayout_3">
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_11">
+               <property name="minimumSize"><size><width>90</width><height>0</height></size></property>
+               <property name="text"><string>Country/Region</string></property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="left_coord_sys">
+               <property name="minimumSize"><size><width>260</width><height>0</height></size></property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_12">
+               <property name="minimumSize"><size><width>90</width><height>0</height></size></property>
+               <property name="text"><string>CRS</string></property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QComboBox" name="left_crs_select">
+               <property name="minimumSize"><size><width>260</width><height>0</height></size></property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QPushButton" name="lWkt">
+               <property name="minimumSize"><size><width>90</width><height>26</height></size></property>
+               <property name="maximumSize"><size><width>90</width><height>26</height></size></property>
+               <property name="styleSheet"><string notr="true">background-color: #729FCF; color: white;</string></property>
+               <property name="text"><string>WKT</string></property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item row="0" column="1">
-         <widget class="QComboBox" name="right_coord_sys_file">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>260</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>260</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="baseSize">
-           <size>
-            <width>260</width>
-            <height>0</height>
-           </size>
-          </property>
-         </widget>
+         <layout class="QVBoxLayout" name="verticalLayout_buttons">
+          <item>
+           <spacer name="interactiveTopSpacer">
+            <property name="orientation"><enum>Qt::Vertical</enum></property>
+            <property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property>
+           </spacer>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_convert">
+            <item>
+             <spacer name="convertLeftSpacer">
+              <property name="orientation"><enum>Qt::Horizontal</enum></property>
+              <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="convert">
+              <property name="minimumSize"><size><width>90</width><height>26</height></size></property>
+              <property name="styleSheet"><string notr="true">background-color: #73D216;</string></property>
+              <property name="text"><string>Convert &gt;</string></property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="convertRightSpacer">
+              <property name="orientation"><enum>Qt::Horizontal</enum></property>
+              <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_convert_reverse">
+            <item>
+             <spacer name="reverseLeftSpacer">
+              <property name="orientation"><enum>Qt::Horizontal</enum></property>
+              <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="convert_reverse">
+              <property name="minimumSize"><size><width>90</width><height>26</height></size></property>
+              <property name="styleSheet"><string notr="true">background-color: #73D216;</string></property>
+              <property name="text"><string>&lt; Convert</string></property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="reverseRightSpacer">
+              <property name="orientation"><enum>Qt::Horizontal</enum></property>
+              <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="interactiveBottomSpacer">
+            <property name="orientation"><enum>Qt::Vertical</enum></property>
+            <property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property>
+           </spacer>
+          </item>
+         </layout>
         </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_northing">
-          <property name="text">
-           <string>Northing</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_easting">
-          <property name="text">
-           <string>Easting</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="2">
-         <widget class="QLabel" name="label_4">
-          <property name="text">
-           <string>Choose column</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="2">
-         <widget class="QLabel" name="label_5">
-          <property name="text">
-           <string>Choose column</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QComboBox" name="combo_northing" />
-        </item>
-        <item row="3" column="1">
-         <widget class="QComboBox" name="combo_easting" />
+        <item row="0" column="2">
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QGroupBox" name="groupBox_3">
+            <property name="title"><string>Output Coordinates</string></property>
+            <layout class="QGridLayout" name="gridLayout_2">
+             <item row="0" column="0">
+              <widget class="QLabel" name="rLat">
+               <property name="minimumSize"><size><width>90</width><height>0</height></size></property>
+               <property name="text"><string>Northing</string></property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLineEdit" name="northing">
+               <property name="alignment"><set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set></property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="rLon">
+               <property name="minimumSize"><size><width>90</width><height>0</height></size></property>
+               <property name="text"><string>Easting</string></property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLineEdit" name="easting">
+               <property name="alignment"><set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set></property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox_8">
+            <property name="sizePolicy"><sizepolicy hsizetype="Preferred" vsizetype="Expanding"><horstretch>0</horstretch><verstretch>0</verstretch></sizepolicy></property>
+            <property name="title"><string>Output Coordinate System</string></property>
+            <layout class="QGridLayout" name="gridLayout">
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_7">
+               <property name="minimumSize"><size><width>90</width><height>0</height></size></property>
+               <property name="text"><string>Country/Region</string></property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="right_coord_sys">
+               <property name="minimumSize"><size><width>260</width><height>0</height></size></property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_8">
+               <property name="minimumSize"><size><width>90</width><height>0</height></size></property>
+               <property name="text"><string>CRS</string></property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QComboBox" name="right_crs_select">
+               <property name="minimumSize"><size><width>260</width><height>0</height></size></property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QPushButton" name="rWkt">
+               <property name="minimumSize"><size><width>90</width><height>26</height></size></property>
+               <property name="maximumSize"><size><width>90</width><height>26</height></size></property>
+               <property name="styleSheet"><string notr="true">background-color: #729FCF; color: white;</string></property>
+               <property name="text"><string>WKT</string></property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>
-     <widget class="QPushButton" name="rWkt_file">
-          <property name="geometry"><rect><x>165</x><y>164</y><width>90</width><height>26</height></rect></property><property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>90</width>
-            <height>26</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>90</width>
-            <height>26</height>
-           </size>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">background-color: #729FCF; color: white;</string>
-          </property>
-          <property name="text">
-           <string>WKT</string>
-          </property>
-         </widget>
-        </widget>
-     <widget class="QGroupBox" name="groupBox_11">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>260</y>
-        <width>431</width>
-        <height>200</height>
-       </rect>
-      </property>
-      <property name="title">
-       <string>Input Coordinate System</string>
-      </property>
-      <widget class="QWidget" name="layoutWidget_5">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>30</y>
-         <width>394</width>
-         <height>120</height>
-        </rect>
-       </property>
-       <layout class="QGridLayout" name="gridLayout_6">
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_latitude">
-          <property name="text">
-           <string>Latitude</string>
-          </property>
+      <widget class="QWidget" name="point_file">
+       <attribute name="title"><string>Point File</string></attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_pointfile">
+        <item>
+         <widget class="QWidget" name="file_display_widget">
+          <property name="sizePolicy"><sizepolicy hsizetype="Preferred" vsizetype="Expanding"><horstretch>0</horstretch><verstretch>0</verstretch></sizepolicy></property>
+          <layout class="QVBoxLayout" name="verticalLayout_3">
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <item>
+              <widget class="QLabel" name="label">
+               <property name="text"><string>Input File</string></property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="filename"/>
+             </item>
+             <item>
+              <widget class="QPushButton" name="fileSelect">
+               <property name="minimumSize"><size><width>90</width><height>26</height></size></property>
+               <property name="styleSheet"><string notr="true">background-color: #e0e0e0;</string></property>
+               <property name="text"><string>Open File</string></property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QTableView" name="tableview"/>
+           </item>
+          </layout>
          </widget>
         </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_longitude">
-          <property name="text">
-           <string>Longitude</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_13">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>100</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Country/Region</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QComboBox" name="left_coord_sys_file">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>260</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>260</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="baseSize">
-           <size>
-            <width>260</width>
-            <height>0</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_14">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>100</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>CRS</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QComboBox" name="left_crs_select_file">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>260</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>260</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="baseSize">
-           <size>
-            <width>260</width>
-            <height>0</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="2">
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>Choose column</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="2">
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>Choose column</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QComboBox" name="combo_lat" />
-        </item>
-        <item row="3" column="1">
-         <widget class="QComboBox" name="combo_lon" />
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_bottom">
+          <item>
+           <widget class="QGroupBox" name="groupBox_11">
+            <property name="title"><string>Input Coordinate System</string></property>
+            <layout class="QGridLayout" name="gridLayout_6">
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_13">
+               <property name="minimumSize"><size><width>90</width><height>0</height></size></property>
+               <property name="text"><string>Country/Region</string></property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="left_coord_sys_file">
+               <property name="minimumSize"><size><width>260</width><height>0</height></size></property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_14">
+               <property name="minimumSize"><size><width>90</width><height>0</height></size></property>
+               <property name="text"><string>CRS</string></property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QComboBox" name="left_crs_select_file">
+               <property name="minimumSize"><size><width>260</width><height>0</height></size></property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_latitude">
+               <property name="text"><string>Latitude</string></property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QComboBox" name="combo_lat"/>
+             </item>
+             <item row="2" column="2">
+              <widget class="QLabel" name="label_2">
+               <property name="text"><string>Choose column</string></property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="label_longitude">
+               <property name="text"><string>Longitude</string></property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QComboBox" name="combo_lon"/>
+             </item>
+             <item row="3" column="2">
+              <widget class="QLabel" name="label_3">
+               <property name="text"><string>Choose column</string></property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QPushButton" name="lWkt_file">
+               <property name="minimumSize"><size><width>90</width><height>26</height></size></property>
+               <property name="maximumSize"><size><width>90</width><height>26</height></size></property>
+               <property name="styleSheet"><string notr="true">background-color: #729FCF; color: white;</string></property>
+               <property name="text"><string>WKT</string></property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_filebuttons">
+            <item>
+             <widget class="QPushButton" name="add_column">
+              <property name="minimumSize"><size><width>90</width><height>26</height></size></property>
+              <property name="styleSheet"><string notr="true">background-color: #e0e0e0;</string></property>
+              <property name="text"><string>Add Column</string></property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="fileButtonGapSpacer">
+              <property name="orientation"><enum>Qt::Vertical</enum></property>
+              <property name="sizeType"><enum>QSizePolicy::Fixed</enum></property>
+              <property name="sizeHint" stdset="0"><size><width>20</width><height>8</height></size></property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="convert_file">
+              <property name="minimumSize"><size><width>90</width><height>26</height></size></property>
+              <property name="styleSheet"><string notr="true">background-color: #73D216;</string></property>
+              <property name="text"><string>Convert &gt;</string></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="save_file">
+              <property name="minimumSize"><size><width>90</width><height>26</height></size></property>
+              <property name="styleSheet"><string notr="true">background-color: #73D216;</string></property>
+              <property name="text"><string>Save</string></property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="fileButtonsBottomSpacer">
+              <property name="orientation"><enum>Qt::Vertical</enum></property>
+              <property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox_10">
+            <property name="title"><string>Output Coordinate System</string></property>
+            <layout class="QGridLayout" name="gridLayout_5">
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_9">
+               <property name="minimumSize"><size><width>90</width><height>0</height></size></property>
+               <property name="text"><string>Country/Region</string></property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="right_coord_sys_file">
+               <property name="minimumSize"><size><width>260</width><height>0</height></size></property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_10">
+               <property name="minimumSize"><size><width>90</width><height>0</height></size></property>
+               <property name="text"><string>CRS</string></property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QComboBox" name="right_crs_select_file">
+               <property name="minimumSize"><size><width>260</width><height>0</height></size></property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_northing">
+               <property name="text"><string>Northing</string></property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QComboBox" name="combo_northing"/>
+             </item>
+             <item row="2" column="2">
+              <widget class="QLabel" name="label_4">
+               <property name="text"><string>Choose column</string></property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="label_easting">
+               <property name="text"><string>Easting</string></property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QComboBox" name="combo_easting"/>
+             </item>
+             <item row="3" column="2">
+              <widget class="QLabel" name="label_5">
+               <property name="text"><string>Choose column</string></property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QPushButton" name="rWkt_file">
+               <property name="minimumSize"><size><width>90</width><height>26</height></size></property>
+               <property name="maximumSize"><size><width>90</width><height>26</height></size></property>
+               <property name="styleSheet"><string notr="true">background-color: #729FCF; color: white;</string></property>
+               <property name="text"><string>WKT</string></property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>
-     <widget class="QPushButton" name="lWkt_file">
-          <property name="geometry"><rect><x>170</x><y>164</y><width>90</width><height>26</height></rect></property><property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>90</width>
-            <height>26</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>90</width>
-            <height>26</height>
-           </size>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">background-color: #729FCF; color: white;</string>
-          </property>
-          <property name="text">
-           <string>WKT</string>
-          </property>
-         </widget>
-        </widget>
-     <widget class="QWidget" name="file_display_widget">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>20</y>
-        <width>991</width>
-        <height>225</height>
-       </rect>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <item>
-          <widget class="QLabel" name="label">
-           <property name="text">
-            <string>Input File</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="filename" />
-         </item>
-         <item>
-          <widget class="QPushButton" name="fileSelect">
-           <property name="minimumSize">
-            <size>
-             <width>90</width>
-             <height>26</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>90</width>
-             <height>26</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Open File</string>
-           </property>
-          <property name="styleSheet"><string notr="true">background-color: #e0e0e0;</string></property></widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="QTableView" name="tableview" />
-       </item>
-      </layout>
      </widget>
-     <widget class="QPushButton" name="convert_file">
-      <property name="geometry">
-       <rect>
-        <x>460</x>
-        <y>310</y>
-        <width>90</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background-color: #73D216;</string>
-      </property>
-      <property name="text">
-       <string>Convert &gt;</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="add_column">
-      <property name="geometry">
-       <rect>
-        <x>460</x>
-        <y>250</y>
-        <width>90</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>90</width>
-        <height>26</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>90</width>
-        <height>26</height>
-       </size>
-      </property>
-      <property name="text">
-       <string>Add Column</string>
-      </property>
-     <property name="styleSheet"><string notr="true">background-color: #e0e0e0;</string></property></widget>
-     <widget class="QPushButton" name="save_file">
-      <property name="geometry">
-       <rect>
-        <x>460</x>
-        <y>345</y>
-        <width>90</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background-color: #73D216;</string>
-      </property>
-      <property name="text">
-       <string>Save</string>
-      </property>
-     </widget>
-    </widget>
-   </widget>
-  </item></layout></widget>
+    </item>
+   </layout>
+  </widget>
   <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1030</width>
-     <height>22</height>
-    </rect>
-   </property>
+   <property name="geometry"><rect><x>0</x><y>0</y><width>1030</width><height>22</height></rect></property>
    <widget class="QMenu" name="menu_File">
-    <property name="title">
-     <string>&amp;File</string>
-    </property>
-    <addaction name="action_Open" />
-    <addaction name="action_Close" />
-    <addaction name="separator" />
-    <addaction name="action_Options" />
-    <addaction name="action_Print" />
-    <addaction name="separator" />
-    <addaction name="action_Exit" />
+    <property name="title"><string>&amp;File</string></property>
+    <addaction name="action_Open"/>
+    <addaction name="action_Close"/>
+    <addaction name="separator"/>
+    <addaction name="action_Options"/>
+    <addaction name="action_Print"/>
+    <addaction name="separator"/>
+    <addaction name="action_Exit"/>
    </widget>
    <widget class="QMenu" name="menu_About">
-    <property name="title">
-     <string>&amp;Help</string>
-    </property>
-    <addaction name="action_About" />
+    <property name="title"><string>&amp;Help</string></property>
+    <addaction name="action_About"/>
    </widget>
-   <addaction name="menu_File" />
-   <addaction name="menu_About" />
+   <addaction name="menu_File"/>
+   <addaction name="menu_About"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar" />
-  <action name="action_Open">
-   <property name="text">
-    <string>&amp;Open</string>
-   </property>
-  </action>
-  <action name="action_Close">
-   <property name="text">
-    <string>&amp;Save</string>
-   </property>
-  </action>
-  <action name="action_Print">
-   <property name="text">
-    <string>&amp;Print</string>
-   </property>
-  </action>
-  <action name="action_Exit">
-   <property name="text">
-    <string>&amp;Exit</string>
-   </property>
-  </action>
-  <action name="action_About">
-   <property name="text">
-    <string>&amp;About</string>
-   </property>
-  </action>
-  <action name="action_Options">
-   <property name="text">
-    <string>Options</string>
-   </property>
-  </action>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="action_Open"><property name="text"><string>&amp;Open</string></property></action>
+  <action name="action_Close"><property name="text"><string>&amp;Save</string></property></action>
+  <action name="action_Print"><property name="text"><string>&amp;Print</string></property></action>
+  <action name="action_Exit"><property name="text"><string>&amp;Exit</string></property></action>
+  <action name="action_About"><property name="text"><string>&amp;About</string></property></action>
+  <action name="action_Options"><property name="text"><string>Options</string></property></action>
  </widget>
- <resources />
- <connections />
+ <resources/>
+ <connections/>
 </ui>
+
+
+
+
+
+

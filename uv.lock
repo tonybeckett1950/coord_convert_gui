@@ -22,7 +22,7 @@ wheels = [
 [[package]]
 name = "coord-convert-gui"
 version = "1.0.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "openpyxl" },
     { name = "pandas" },

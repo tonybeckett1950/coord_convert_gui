@@ -1,16 +1,17 @@
 import pathlib
 
-from PySide6 import QtCore, QtGui
+from PySide6 import QtGui
 from PySide6.QtWidgets import (
     QCheckBox,
     QDialog,
+    QGridLayout,
     QGroupBox,
+    QHBoxLayout,
     QLabel,
     QPushButton,
     QRadioButton,
     QSpinBox,
     QVBoxLayout,
-    QWidget,
 )
 
 
@@ -20,56 +21,55 @@ class OptionsDialog(QDialog):
         super().__init__()
         self.settings = settings
         self.setWindowTitle("Display Formats")
-        resources = pathlib.Path(__file__).resolve().parent / "resources"
+        # resources/ lives at the repository root, one level above this package.
+        resources = pathlib.Path(__file__).resolve().parent.parent / "resources"
         self.setWindowIcon(QtGui.QIcon(str(resources / "globe.png")))
         self.resize(491, 257)
         self._build_ui()
         self._load_settings()
 
     def _build_ui(self) -> None:
-        ang_box = QGroupBox("Angular Measurements Format", self)
-        ang_box.setGeometry(QtCore.QRect(20, 10, 451, 131))
+        outer = QVBoxLayout(self)
 
-        layout_widget = QWidget(ang_box)
-        layout_widget.setGeometry(QtCore.QRect(10, 30, 196, 83))
-        layout = QVBoxLayout(layout_widget)
-        layout.setContentsMargins(0, 0, 0, 0)
-
-        self.optD = QRadioButton("Degrees", layout_widget)
-        self.optDM = QRadioButton("Degrees minutes", layout_widget)
-        self.optDMS = QRadioButton("Degrees minutes seconds", layout_widget)
-        for btn in (self.optD, self.optDM, self.optDMS):
-            layout.addWidget(btn)
-
+        ang_box = QGroupBox("Angular Measurements Format")
+        ang_grid = QGridLayout(ang_box)
+        self.optD = QRadioButton("Degrees", ang_box)
+        self.optDM = QRadioButton("Degrees minutes", ang_box)
+        self.optDMS = QRadioButton("Degrees minutes seconds", ang_box)
         self.spinD = QSpinBox(ang_box)
-        self.spinD.setGeometry(QtCore.QRect(390, 30, 49, 26))
         self.spinDM = QSpinBox(ang_box)
-        self.spinDM.setGeometry(QtCore.QRect(390, 60, 49, 26))
         self.spinDMS = QSpinBox(ang_box)
-        self.spinDMS.setGeometry(QtCore.QRect(390, 90, 49, 26))
+        for spin in (self.spinD, self.spinDM, self.spinDMS):
+            spin.setMaximumWidth(60)
+        ang_grid.addWidget(self.optD, 0, 0)
+        ang_grid.addWidget(self.optDM, 1, 0)
+        ang_grid.addWidget(self.optDMS, 2, 0)
+        for row, spin in enumerate((self.spinD, self.spinDM, self.spinDMS)):
+            ang_grid.addWidget(QLabel("Decimal places", ang_box), row, 1)
+            ang_grid.addWidget(spin, row, 2)
+        ang_grid.setColumnStretch(1, 1)
+        outer.addWidget(ang_box)
 
-        for y in (30, 60, 90):
-            QLabel("Decimal places", ang_box).setGeometry(
-                QtCore.QRect(280, y, 101, 26)
-            )
-
-        lin_box = QGroupBox("Linear Measurements Format", self)
-        lin_box.setGeometry(QtCore.QRect(20, 150, 451, 61))
-
-        QLabel("Decimal places", lin_box).setGeometry(
-            QtCore.QRect(280, 30, 101, 26)
-        )
-        self.spinLength = QSpinBox(lin_box)
-        self.spinLength.setGeometry(QtCore.QRect(390, 30, 49, 26))
+        lin_box = QGroupBox("Linear Measurements Format")
+        lin_grid = QGridLayout(lin_box)
         self.chkCommas = QCheckBox("Comma separators", lin_box)
-        self.chkCommas.setGeometry(QtCore.QRect(10, 30, 171, 23))
+        self.spinLength = QSpinBox(lin_box)
+        self.spinLength.setMaximumWidth(60)
+        lin_grid.addWidget(self.chkCommas, 0, 0)
+        lin_grid.addWidget(QLabel("Decimal places", lin_box), 0, 1)
+        lin_grid.addWidget(self.spinLength, 0, 2)
+        lin_grid.setColumnStretch(1, 1)
+        outer.addWidget(lin_box)
 
-        btn_ok = QPushButton("OK", self)
-        btn_ok.setGeometry(QtCore.QRect(310, 220, 83, 25))
-        btn_ok.clicked.connect(self.accept)
-        btn_cancel = QPushButton("Cancel", self)
-        btn_cancel.setGeometry(QtCore.QRect(70, 220, 83, 25))
+        btn_row = QHBoxLayout()
+        btn_cancel = QPushButton("Cancel")
         btn_cancel.clicked.connect(self.reject)
+        btn_ok = QPushButton("OK")
+        btn_ok.clicked.connect(self.accept)
+        btn_row.addStretch(1)
+        btn_row.addWidget(btn_cancel)
+        btn_row.addWidget(btn_ok)
+        outer.addLayout(btn_row)
 
     def _load_settings(self) -> None:
         ang_fmt = self.settings["ang_fmt"]
