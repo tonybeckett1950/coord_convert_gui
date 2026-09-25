@@ -1,7 +1,7 @@
 # Code Audit Plan — coord_convert_gui
 
 **Date:** 2026-09-25
-**Status:** Phase 1 complete (commit `3fc3366`, pushed). Phases 2–3 not started.
+**Status:** Phases 1–2 complete (commits `3fc3366` and `2b9885b`; Phase 1 pushed, Phase 2 local). Phase 3 not started.
 
 ## 1. Background & scope
 
@@ -31,9 +31,10 @@ three phases ordered by risk and effort:
 | P1 | Medium | The out-of-bounds CRS check resolved a fresh `CRS` object for every entry of the ~5,600-row CRS database on **every** call — seconds of redundant work per conversion. | `_outside_crs_bounds` in `main.py` |
 | A7 | Low | Dead relative-import fallback (`try: from . import ...`) left over from the pre-flatten package layout. | `main.py` |
 
-Known edge case deferred (noted during Phase 1): in the bounds-warning suggestion
-loop, candidate CRSs are filtered by the **target** CRS type even when the
-**source** CRS is the violator. Works for the common case; revisit with Phase 2.
+Known edge case deferred during Phase 1, **resolved in Phase 2** (`2b9885b`):
+in the bounds-warning suggestion loop, candidate CRSs were filtered by the
+**target** CRS type even when the **source** CRS was the violator; suggestions
+are now filtered by the violating CRS's own type.
 
 ## 3. Plan changes (vs. original audit proposal)
 
@@ -50,6 +51,21 @@ loop, candidate CRSs are filtered by the **target** CRS type even when the
    no pickle code shipped in the app).
 4. **Phase 1 scope held to hygiene/quick-wins only.** Package restructure, layout
    rewrite, and threading were explicitly excluded and remain Phases 2–3.
+5. **`resources/` stays at the repo root (Phase 2).** It is resolved from the
+   package's parent directory instead of being moved into the package;
+   bundling resources into a distributable wheel remains Phase 3 packaging work.
+6. **Options dialog converted to layouts too (Phase 2).** The layout rewrite
+   covered `options.py` (fixed-geometry construction) in addition to
+   `mainwindow.ui`.
+7. **Smoke test moved into the repo (Phase 2).** It now lives at
+   `tests/smoke_test.py` (previously a throwaway `/tmp` script) and was
+   extended with source-side bounds-suggestion coverage and `.xls`/`.xlsx`
+   import through the app's `_open_file` path (file dialog stubbed; the
+   `.xls` fixture needs optional `xlwt`, run via `uv run --with xlwt`).
+8. **Explicit build-system added (Phase 2).** uv delegates editable installs to
+   setuptools here, whose flat-layout auto-discovery fails with multiple
+   top-level directories; `pyproject.toml` now pins `setuptools` and sets
+   `packages.find include = ["coord_convert_gui*"]`.
 
 ## 4. Phase 1 — Hygiene & quick wins ✅ (commit `3fc3366`)
 
@@ -74,24 +90,49 @@ Steps (all completed):
    (`_crs_area()`); rewrite `_outside_crs_bounds` to consume the cached tuples.
 10. **A7** Remove the dead relative-import fallback in `main.py`.
 
-## 5. Phase 2 — Package restructure & layout rewrite (not started)
+## 5. Phase 2 — Package restructure & layout rewrite ✅ (commit `2b9885b`)
 
-Proposed steps:
+Steps (all completed):
 
-1. Move app code from repo root into a package directory (e.g.
-   `coord_convert_gui/` with `__init__.py`, `main.py`, `options.py`,
-   `ui_mainwindow.py`).
-2. Update `pyproject.toml`: entry point to the new module path; resolve the uv
-   "project is not packaged" warning (`tool.uv.package = true` or a build-system).
-3. Make resource paths resolve relative to the package (not CWD); move
-   `resources/` accordingly if needed.
-4. Add a script/command to regenerate `ui_mainwindow.py` with `pyside6-uic` into
-   the new location; keep the generated file in sync with `mainwindow.ui`.
-5. Layout rewrite: rework the main-window layout in `resources/mainwindow.ui`
-   (alignment, resize behaviour, widget grouping), then regenerate and re-verify.
-6. Revisit the deferred bounds-suggestion edge case (source-type filtering).
-7. Re-run the full offscreen smoke test after the move; confirm no stale root-level
-   module references remain.
+1. **Package move.** `main.py`, `options.py`, `ui_mainwindow.py` moved into
+   `coord_convert_gui/` via `git mv` (history preserved) with an empty
+   `__init__.py`; imports switched to relative (`from . import options`,
+   `from .ui_mainwindow import Ui_MainWindow`).
+2. **Packaging.** Entry point is now `coord_convert_gui.main:main`;
+   `[tool.uv] package = true` makes uv install the project itself, so the old
+   "project is not packaged" warning is gone and `uv run coord-convert` works.
+   Explicit setuptools build config with
+   `packages.find include = ["coord_convert_gui*"]` because flat-layout
+   auto-discovery fails on `data/`, `icons/`, `resources/`.
+3. **Resource paths.** `main.py` and `options.py` resolve `resources/` from
+   the package's parent directory (repo root), independent of CWD;
+   `resources/` was not moved (bundling into a wheel is Phase 3).
+4. **UI regeneration.** New `scripts/regen_ui.py` runs `pyside6-uic` from the
+   active environment and writes `coord_convert_gui/ui_mainwindow.py`; the
+   regenerated file was verified to define every widget name the code uses.
+5. **Layout rewrite.** `resources/mainwindow.ui` rebuilt around real Qt
+   layouts (grid/box + spacers, 1062 → 462 lines): the window is now resizable
+   with a proper minimum size (no more Fixed/Fixed policy); interactive tab =
+   input panel | convert buttons | output panel; point-file tab = file row +
+   expanding table above a bottom row of the two CRS group boxes flanking the
+   action buttons. All widget object names, menus and actions preserved (only
+   the anonymous `layoutWidget*` containers disappeared). The
+   `_reflow_point_file_tab` resize hack in `main.py` was deleted;
+   `OptionsDialog` was also converted from fixed geometry to layouts.
+6. **Bounds-suggestion edge case.** Candidate CRSs are now filtered by the
+   *violator's* type (`crs_type`) instead of always the target type, so a
+   source-side violation suggests alternative source CRSs (e.g. a different
+   UTM zone) rather than geographic ones. Covered by smoke-test step 8.
+7. **Verification.** Smoke test moved to `tests/smoke_test.py` and extended
+   (source-side suggestions; `.xls`/`.xlsx` import through `_open_file` with a
+   stubbed file dialog). Full run passes offscreen, including both spreadsheet
+   formats (`uv run --with xlwt python tests/smoke_test.py`). Entry-point
+   launch verified offscreen.
+
+Note carried to Phase 3 review: suggestion *ordering* still ranks candidates by
+distance from their area-of-use bbox centre, so a global grid CRS (e.g.
+EASE-Grid) can outrank the geographically closest UTM zone; all suggestions
+are now at least of the correct CRS type.
 
 ## 6. Phase 3 — Threading & packaging (not started)
 
@@ -109,11 +150,15 @@ Proposed steps:
 
 ## 7. Verification approach
 
-- **Offscreen smoke test** (`QT_QPA_PLATFORM=offscreen`), covering: CRS DB load,
-  main-window build from generated UI, real conversion cross-checked against an
-  independent pyproj transform (1 m tolerance), reverse round-trip, TableModel
-  data/setData/headerData, options dialog, out-of-bounds guard, and spreadsheet
-  import for both `.xls` and `.xlsx`.
+- **Offscreen smoke test** (`tests/smoke_test.py`, `QT_QPA_PLATFORM=offscreen`),
+  covering: CRS DB load, main-window build from generated UI (all widget names
+  present), real conversion cross-checked against an independent pyproj
+  transform (1 m tolerance), reverse round-trip, TableModel data/setData/
+  headerData, options dialog, out-of-bounds guard with target- *and*
+  source-side suggestions, and spreadsheet import for both `.xls` and `.xlsx`
+  through the app's `_open_file` path.
+- **Entry point:** `uv run coord-convert` launches the app (verified offscreen;
+  process stays alive in the Qt event loop).
 - **Dependency check:** `uv sync` clean; `xlrd`/`openpyxl` importable in the venv.
 - **Hygiene checks:** no stale references (`pickle`, old settings path, old module
   paths); `__pycache__` artifacts cleaned from the repo tree.
