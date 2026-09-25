@@ -11,6 +11,7 @@ import os
 import shutil
 import sys
 import tempfile
+import time
 from pathlib import Path
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
@@ -22,6 +23,7 @@ faulthandler.enable()
 faulthandler.dump_traceback_later(120, exit=True)
 
 import pandas as pd  # noqa: E402
+from PySide6.QtCore import Qt  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 from pyproj import Transformer  # noqa: E402
 
@@ -188,6 +190,96 @@ try:
     finally:
         main.QFileDialog = orig_dialog
         shutil.rmtree(tmpdir, ignore_errors=True)
+
+    # 10. Threaded file conversion (worker runs off the GUI thread)
+    w.data = pd.DataFrame({
+        "Latitude": [51.4779, 48.8566, 52.3740],
+        "Longitude": [-0.0015, 2.3522, 4.8897],
+        "Northing": [0.0, 0.0, 0.0],
+        "Easting": [0.0, 0.0, 0.0],
+    })
+    _cols = ["Latitude", "Longitude", "Northing", "Easting"]
+    for combo, val in (
+        (w.combo_lat, "Latitude"), (w.combo_lon, "Longitude"),
+        (w.combo_northing, "Northing"), (w.combo_easting, "Easting"),
+    ):
+        combo.clear()
+        combo.addItems([""] + _cols)
+        combo.setCurrentIndex(combo.findText(val))
+    w.left_coord_sys_file.setCurrentIndex(w.left_coord_sys_file.findText("World"))
+    w.left_crs_select_file.setCurrentIndex(
+        w.left_crs_select_file.findText("WGS 84")
+    )
+    w.right_coord_sys_file.setCurrentIndex(w.right_coord_sys_file.findText("World"))
+    w.right_crs_select_file.setCurrentIndex(
+        w.right_crs_select_file.findText("WGS 84 / UTM zone 30N")
+    )
+    assert w.convert_file.isEnabled()
+    w.convertFile()
+    # Buttons must be disabled while the worker runs (Phase 3 step 2).
+    assert not w.convert_file.isEnabled(), "convert_file should be disabled mid-job"
+    deadline = time.time() + 30
+    while w._convert_worker is not None and time.time() < deadline:
+        app.processEvents()
+        time.sleep(0.01)
+    assert w._convert_worker is None, "file conversion worker did not finish"
+    assert w.convert_file.isEnabled(), "convert_file should be re-enabled after job"
+    t = Transformer.from_crs(4326, "epsg:32630", always_xy=True)
+    for i in range(len(w.data)):
+        exp_e, exp_n = t.transform(
+            float(w.data.iloc[i]["Longitude"]), float(w.data.iloc[i]["Latitude"])
+        )
+        got_n = float(str(w.data.iloc[i]["Northing"]).replace(",", ""))
+        got_e = float(str(w.data.iloc[i]["Easting"]).replace(",", ""))
+        assert abs(got_n - exp_n) < 1.0 and abs(got_e - exp_e) < 1.0, (
+            i, got_n, got_e, exp_n, exp_e,
+        )
+    print("10. Threaded file conversion OK:", len(w.data), "rows")
+
+    # 11. Message boxes use explicit text formats: WKT view must show raw
+    #     quotes as plain text (no &quot; entities from html.escape + AutoText);
+    #     the About dialog keeps its static HTML as rich text.
+    class _FakeMsgBox:
+        captured: dict = {}
+
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def setWindowIcon(self, icon):
+            pass
+
+        def setWindowTitle(self, title):
+            _FakeMsgBox.captured["title"] = title
+
+        def setTextFormat(self, fmt):
+            _FakeMsgBox.captured["format"] = fmt
+
+        def setText(self, text):
+            _FakeMsgBox.captured["text"] = text
+
+        def exec(self):
+            pass
+
+    orig_msgbox = main.QMessageBox
+    main.QMessageBox = _FakeMsgBox
+    try:
+        w._show_wkt(4326)
+        assert "&quot;" not in _FakeMsgBox.captured["text"], (
+            "WKT view contains HTML entities"
+        )
+        assert '"' in _FakeMsgBox.captured["text"], "WKT lost its quotes"
+        assert _FakeMsgBox.captured["format"] == Qt.TextFormat.PlainText, (
+            f"WKT view format: {_FakeMsgBox.captured['format']}"
+        )
+        print("11a. WKT view OK: plain text with raw quotes")
+        w._show_about()
+        assert _FakeMsgBox.captured["format"] == Qt.TextFormat.RichText, (
+            f"About dialog format: {_FakeMsgBox.captured['format']}"
+        )
+        assert "<h1>" in _FakeMsgBox.captured["text"]
+        print("11b. About dialog OK: rich text preserved")
+    finally:
+        main.QMessageBox = orig_msgbox
 
     print("ALL SMOKE TESTS PASSED")
 finally:

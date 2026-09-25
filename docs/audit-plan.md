@@ -1,7 +1,7 @@
 # Code Audit Plan — coord_convert_gui
 
 **Date:** 2026-09-25
-**Status:** Phases 1–2 complete (commits `3fc3366` and `2b9885b`; Phase 1 pushed, Phase 2 local). Phase 3 not started.
+**Status:** Phases 1–3 complete. Phases 1–2 committed (`3fc3366`, `2b9885b`; Phase 1 pushed, Phase 2 local); Phase 3 (threading + PyInstaller packaging) implemented and verified offscreen, pending commit.
 
 ## 1. Background & scope
 
@@ -134,19 +134,77 @@ distance from their area-of-use bbox centre, so a global grid CRS (e.g.
 EASE-Grid) can outrank the geographically closest UTM zone; all suggestions
 are now at least of the correct CRS type.
 
-## 6. Phase 3 — Threading & packaging (not started)
+## 6. Phase 3 — Threading & packaging ✅ (pending commit)
 
-Proposed steps:
+Steps (all completed):
 
-1. Move long-running work (file conversion, bounds checks over large CRS sets)
-   off the GUI thread using Qt concurrency (`QThread`/`QThreadPoolWorker`).
-2. Add progress reporting and disable convert buttons while a job runs; marshal
-   results back to the main thread for table/status updates.
-3. Surface per-row conversion errors from the worker without blocking the UI.
-4. Packaging: produce a distributable build (FBS/PyInstaller into `target/`) with
-   the working `coord-convert` entry point and bundled resources (`crs.db`, CSS, icons).
-5. Verify packaged app on macOS (and note Windows/Linux differences for the
-   per-user settings path).
+1. **File conversion off the GUI thread.** A `_ConvertWorker` (`QThread`) in
+   `main.py` runs the per-row transform loop on a worker thread. It receives a
+   private copy of just the input columns plus the pyproj `Transformer`, format
+   settings and CRS types, and writes its computed values into plain
+   `results`/`errors` attributes. The main thread applies those results to the
+   live model in `_on_convert_finished`, so pandas is only ever touched from the
+   GUI thread. Single-point conversion stays synchronous (one transform).
+2. **Progress + button state.** The worker emits a native-int `progress(done,
+   total)` signal that updates the status bar with a running count/percentage;
+   `_set_file_actions_enabled(False)` disables the point-file action buttons
+   (`fileSelect`, `save_file`, `add_column`, `convert_file`) while a job runs and
+   re-enables them on completion. A `closeEvent` override waits (bounded) for a
+   running worker before the window closes.
+3. **Per-row errors surfaced off-thread.** The worker collects per-row errors
+   without blocking; `_on_convert_finished` shows the same "Conversion Errors"
+   preview box as before once the job completes.
+4. **PyInstaller packaging.** `coord-convert.spec` (one-dir, `--windowed`,
+   `console=False`) bundles `crs.db`, `custom.css` and the icons under a top-level
+   `resources/` dir via `datas=`, with a thin absolute-import launcher
+   (`coord_convert_app.py`) as the entry point and `openpyxl`/`xlrd` listed as
+   hiddenimports (pandas loads them lazily). Build: `uv run pyinstaller
+   --noconfirm coord-convert.spec --distpath target` → `target/coord-convert.app`
+   on macOS (a proper app bundle; see post-build fix below), a plain one-dir
+   bundle at `target/coord-convert/` elsewhere.
+5. **Frozen-aware resources.** New `coord_convert_gui/_resources.py` exposes
+   `resource_dir()`: `<repo>/resources` in development, `sys._MEIPASS/resources`
+   when frozen. Both `main.py` (`_RESOURCE_DIR`) and `options.py` now use it, so
+   the packaged app finds its resources (verified: a one-dir `_MEIPASS` is the
+   `_internal` dir where PyInstaller places bundled data).
+6. **Verified on macOS.** The packaged binary launched offscreen reaches the Qt
+   event loop with no missing-module/resource errors. The per-user settings path
+   (`_settings_file()`) is already platform-aware (macOS `Application Support`,
+   Windows `%APPDATA%`, Linux `$XDG_CONFIG_HOME`) and deliberately stays *outside*
+   the bundle so runtime state never ships in the app tree.
+
+Implementation notes:
+
+- **Bounds check stays on the GUI thread.** It can raise a modal Yes/No dialog,
+  which must run on the GUI thread; with Phase 1's `lru_cache`d `_crs_area()` it
+  is fast after first use, so only the per-row loop (the genuinely long-running
+  part) moved to the worker.
+- **PySide6 queued-signal limitation.** A data-carrying signal of type
+  `Signal(dict, list)` cannot be delivered across threads ("Cannot copy-convert
+  dict to C++"); results are therefore plain attributes read after QThread's
+  built-in no-arg `finished` signal fires, not passed as signal arguments.
+- Smoke test gained step 10: threaded file conversion end-to-end (buttons disable
+  mid-job, worker completes, results match a direct pyproj transform within 1 m,
+  buttons re-enable), still passing offscreen.
+- **Message-box text formats (post-build fix).** The Phase 1 S3 approach
+  (`html.escape()` + `QMessageBox` AutoText) displayed literal `&quot;` entities
+  in the WKT view: escaped text contains no HTML *tags*, so Qt's AutoText
+  heuristic rendered it as plain text. Message boxes now set an explicit format
+  -- `Qt.TextFormat.PlainText` for all dynamic content (WKT, file/conversion
+  errors, startup error, bounds warning), `RichText` only for the static About
+  dialog -- and the `html.escape()` calls were removed entirely (no HTML
+  interpretation is possible for plain text). Covered by smoke-test step 11.
+- **macOS `.app` bundle (post-build fix).** The first build produced a bare
+  Mach-O executable at `target/coord-convert/coord-convert`; double-clicking it
+  in Finder made macOS launch it through Terminal.app, so a terminal window
+  appeared before the GUI. The spec now ends with a macOS-guarded `BUNDLE(...)`
+  step (icon: generated `resources/Icon.icns`, display name "Coordinate
+  Converter"), producing `target/coord-convert.app`. In that layout
+  `sys._MEIPASS` is `Contents/Frameworks`, so the existing `resource_dir()`
+  (`_MEIPASS/resources`) works unchanged (verified with a frozen probe bundle).
+  The spec also removes the bare one-dir copy COLLECT leaves next to the `.app`,
+  so the bundle is the only launchable artifact. Offscreen launch of
+  `Contents/MacOS/coord-convert` reaches the event loop cleanly.
 
 ## 7. Verification approach
 

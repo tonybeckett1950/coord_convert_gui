@@ -34,6 +34,21 @@ uv run python tests/smoke_test.py            # offscreen smoke test
 uv run --with xlwt python tests/smoke_test.py  # also covers legacy .xls import
 ```
 
+### Building a distributable (PyInstaller)
+
+`pyinstaller` is a dev dependency (`uv sync` installs it). From the repo root:
+
+```bash
+uv run pyinstaller --noconfirm coord-convert.spec --distpath target
+```
+
+On macOS this produces `target/coord-convert.app` — a proper application
+bundle, so double-clicking it launches the GUI directly (a bare executable
+would open Terminal.app first). On Windows/Linux the output is the plain
+one-dir bundle at `target/coord-convert/`. The CRS database, stylesheet and
+icons are bundled under `resources/` inside the app and resolved via
+`sys._MEIPASS` (see `coord_convert_gui/_resources.py`).
+
 ## Settings
 
 Settings are stored per user as JSON in the platform config directory:

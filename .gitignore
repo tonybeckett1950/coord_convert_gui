@@ -6,11 +6,9 @@ __pycache__/
 # Virtual environments
 .venv/
 
-# IDE
-.idea/
-
-# Build output (FBS / PyInstaller)
+# Build output (PyInstaller)
 target/
+build/
 
 # Per-user runtime state (settings now live in the user config dir)
 resources/coordsys.ini

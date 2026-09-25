@@ -1,4 +1,4 @@
-import pathlib
+from ._resources import resource_dir
 
 from PySide6 import QtGui
 from PySide6.QtWidgets import (
@@ -21,8 +21,7 @@ class OptionsDialog(QDialog):
         super().__init__()
         self.settings = settings
         self.setWindowTitle("Display Formats")
-        # resources/ lives at the repository root, one level above this package.
-        resources = pathlib.Path(__file__).resolve().parent.parent / "resources"
+        resources = resource_dir()
         self.setWindowIcon(QtGui.QIcon(str(resources / "globe.png")))
         self.resize(491, 257)
         self._build_ui()
